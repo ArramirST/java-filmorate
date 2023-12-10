@@ -53,12 +53,12 @@ public class UserController {
     }
 
     private void validationCheck(User user, String request) throws ValidationException {
-        if (user.getEmail().isEmpty()||!user.getEmail().contains("@")) {
+        if (user.getEmail().isEmpty() || !user.getEmail().contains("@")) {
             log.warn("Получен запрос {} к эндпоинту /user, ошибка: '{}'", request,
                     "Электронная почта не может быть пустой и должна содержать символ @");
             throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ @");
         }
-        if (user.getLogin().isEmpty()||user.getLogin().contains(" ")) {
+        if (user.getLogin().isEmpty() || user.getLogin().contains(" ")) {
             log.warn("Получен запрос {} к эндпоинту /user, ошибка: '{}'", request,
                     "Логин не может быть пустым и содержать пробелы");
             throw new ValidationException("Логин не может быть пустым и содержать пробелы");
