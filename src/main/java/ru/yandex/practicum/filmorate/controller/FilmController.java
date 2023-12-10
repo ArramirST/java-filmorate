@@ -32,7 +32,7 @@ public class FilmController {
         Film sameFilm = null;
         boolean isExist = false;
         for (Film filmInMemory : films) {
-            if (film.getId()==filmInMemory.getId()) {
+            if (film.getId() == filmInMemory.getId()) {
                 isExist = true;
                 sameFilm = filmInMemory;
             }
@@ -59,7 +59,7 @@ public class FilmController {
                     "Название не может быть пустым");
             throw new ValidationException("Название не может быть пустым");
         }
-        if (film.getDescription().length()>200) {
+        if (film.getDescription().length() > 200) {
             log.warn("Получен запрос {} к эндпоинту /film, ошибка: '{}'", request,
                     "Максимальная длина описания — 200 символов");
             throw new ValidationException("Максимальная длина описания — 200 символов");

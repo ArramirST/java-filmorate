@@ -31,7 +31,7 @@ public class UserController {
         boolean isExist = false;
         User sameUser = null;
         for (User userInMemory : users) {
-            if (user.getId()==userInMemory.getId()) {
+            if (user.getId() == userInMemory.getId()) {
                 isExist = true;
                 sameUser = userInMemory;
             }
