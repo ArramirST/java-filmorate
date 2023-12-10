@@ -4,11 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,7 +69,7 @@ public class FilmController {
                     "Дата релиза — не раньше 28 декабря 1895 года");
             throw new ValidationException("Дата релиза — не раньше 28 декабря 1895 года");
         }
-        if (film.getDuration()<0) {
+        if (film.getDuration() < 0) {
             log.warn("Получен запрос {} к эндпоинту /film, ошибка: '{}'", request,
                     "Продолжительность фильма должна быть положительной");
             throw new ValidationException("Продолжительность фильма должна быть положительной");
@@ -79,12 +77,13 @@ public class FilmController {
     }
 
     private Film generateId(Film film) {
-        if (film.getId()==0) {
+        if (film.getId() == 0) {
             for (int i = 1; i < 10000; i++) {
                 boolean isExist = false;
                 for (Film film1 : films) {
-                    if (film1.getId()==i) {
+                    if (film1.getId() == i) {
                         isExist = true;
+                        break;
                     }
                 }
                 if (!isExist) {

@@ -3,12 +3,10 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exeptions.ValidationException;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,12 +71,13 @@ public class UserController {
     }
 
     private User generateIdAndName(User user) {
-        if (user.getId()==0) {
+        if (user.getId() == 0) {
             for (int i = 1; i < 10000; i++) {
                 boolean isExist = false;
                 for (User user1 : users) {
-                    if (user1.getId()==i) {
+                    if (user1.getId() == i) {
                         isExist = true;
+                        break;
                     }
                 }
                 if (!isExist) {
@@ -87,7 +86,7 @@ public class UserController {
                 }
             }
         }
-        if (user.getName()==null) {
+        if (user.getName() == null) {
             user.setName(user.getLogin());
         }
         return user;
