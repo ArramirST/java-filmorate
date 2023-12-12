@@ -8,37 +8,33 @@ import ru.yandex.practicum.filmorate.model.User;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @Slf4j
 public class UserController {
 
-    private List<User> users = new ArrayList<>();
+    private Map<Integer, User> users = new HashMap<>();
+    private static int minAvailableId = 1;
 
     @PostMapping("/users")
     public User createUser(@Valid @RequestBody User user) {
         user = generateIdAndName(user);
         validationCheck(user, "POST");
-        users.add(user);
+        users.put(user.getId(), user);
         log.info("Получен запрос POST к эндпоинту /user, Строка параметров запроса: '{}'", user);
         return user;
     }
 
     @PutMapping("/users")
     public User updateUser(@Valid @RequestBody User user) {
+        user = generateIdAndName(user);
         validationCheck(user, "PUT");
-        boolean isExist = false;
-        User sameUser = null;
-        for (User userInMemory : users) {
-            if (user.getId() == userInMemory.getId()) {
-                isExist = true;
-                sameUser = userInMemory;
-            }
-        }
-        users.remove(sameUser);
-        if (isExist) {
-            users.add(user);
+        if (users.containsKey(user.getId())) {
+            users.remove(user.getId());
+            users.put(user.getId(), user);
             log.info("Получен запрос PUT к эндпоинту /user, Строка параметров запроса: '{}'", user);
             return user;
         } else {
@@ -49,7 +45,7 @@ public class UserController {
 
     @GetMapping("/users")
     public List<User> findAllUsers() {
-        return users;
+        return new ArrayList<>(users.values());
     }
 
     private void validationCheck(User user, String request) throws ValidationException {
@@ -72,19 +68,10 @@ public class UserController {
 
     private User generateIdAndName(User user) {
         if (user.getId() == 0) {
-            for (int i = 1; i < 10000; i++) {
-                boolean isExist = false;
-                for (User user1 : users) {
-                    if (user1.getId() == i) {
-                        isExist = true;
-                        break;
-                    }
-                }
-                if (!isExist) {
-                    user.setId(i);
-                    break;
-                }
+            while (users.containsKey(minAvailableId)) {
+                minAvailableId++;
             }
+            user.setId(minAvailableId);
         }
         if (user.getName() == null) {
             user.setName(user.getLogin());

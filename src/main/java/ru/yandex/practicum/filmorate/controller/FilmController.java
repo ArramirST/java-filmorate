@@ -8,19 +8,22 @@ import ru.yandex.practicum.filmorate.model.Film;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @Slf4j
 public class FilmController {
 
-    private List<Film> films = new ArrayList<>();
+    private Map<Integer, Film> films = new HashMap<>();
+    private static int minAvailableId = 1;
 
     @PostMapping("/films")
     public Film createFilm(@Valid @RequestBody Film film) {
         film = generateId(film);
         validationCheck(film, "POST");
-        films.add(film);
+        films.put(film.getId(), film);
         log.info("Получен запрос POST к эндпоинту /film, Строка параметров запроса: '{}'", film);
         return film;
     }
@@ -29,17 +32,9 @@ public class FilmController {
     public Film updateFilm(@Valid @RequestBody Film film) {
         film = generateId(film);
         validationCheck(film, "PUT");
-        Film sameFilm = null;
-        boolean isExist = false;
-        for (Film filmInMemory : films) {
-            if (film.getId() == filmInMemory.getId()) {
-                isExist = true;
-                sameFilm = filmInMemory;
-            }
-        }
-        films.remove(sameFilm);
-        if (isExist) {
-            films.add(film);
+        if (films.containsKey(film.getId())) {
+            films.remove(film.getId());
+            films.put(film.getId(), film);
             log.info("Получен запрос PUT к эндпоинту /film, Строка параметров запроса: '{}'", film);
             return film;
         } else {
@@ -50,7 +45,7 @@ public class FilmController {
 
     @GetMapping("/films")
     public List<Film> findAllFilms() {
-        return films;
+        return new ArrayList<>(films.values());
     }
 
     private void validationCheck(Film film, String request) throws ValidationException {
@@ -76,21 +71,13 @@ public class FilmController {
         }
     }
 
-    private Film generateId(Film film) {
+    private Film generateId(Film film) { /* Оптимизировал генератор. Не совсем понимаю какое свойство
+                                            AtomicInteger может использоваться для улучшения работы */
         if (film.getId() == 0) {
-            for (int i = 1; i < 10000; i++) {
-                boolean isExist = false;
-                for (Film film1 : films) {
-                    if (film1.getId() == i) {
-                        isExist = true;
-                        break;
-                    }
-                }
-                if (!isExist) {
-                    film.setId(i);
-                    break;
-                }
+            while (films.containsKey(minAvailableId)) {
+                minAvailableId++;
             }
+            film.setId(minAvailableId);
         }
         return film;
     }
