@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage.film;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exeptions.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
@@ -13,8 +14,8 @@ import java.util.*;
 public class InMemoryFilmStorage implements FilmStorage {
 
 
-    private Map<Integer, Film> films = new HashMap<>();
-    private static int minAvailableId = 1;
+    private Map<Long, Film> films = new HashMap<>();
+    private static long minAvailableId = 1;
 
 
     @Override
@@ -27,7 +28,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film updateFilm(Film film) throws ValidationException {
+    public Film updateFilm(Film film) throws ObjectNotFoundException {
         film = generateId(film);
         validationCheck(film, "PUT");
         if (films.containsKey(film.getId())) {
@@ -37,7 +38,7 @@ public class InMemoryFilmStorage implements FilmStorage {
             return film;
         } else {
             log.warn("Фильма не существует");
-            throw new ValidationException("Фильма не существует");
+            throw new ObjectNotFoundException("Фильма не существует");
         }
     }
 
@@ -70,7 +71,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Map<Integer, Film> getFilms() {
+    public Map<Long, Film> getFilms() {
         return films;
     }
 

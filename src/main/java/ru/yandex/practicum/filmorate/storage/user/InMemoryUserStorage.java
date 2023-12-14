@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exeptions.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -15,8 +16,8 @@ import java.util.Map;
 @Slf4j
 public class InMemoryUserStorage implements UserStorage {
 
-    private Map<Integer, User> users = new HashMap<>();
-    private static int minAvailableId = 1;
+    private Map<Long, User> users = new HashMap<>();
+    private static long minAvailableId = 1;
 
     @Override
     public User createUser(User user) throws ValidationException {
@@ -28,7 +29,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User updateUser(User user) throws ValidationException {
+    public User updateUser(User user) throws ObjectNotFoundException {
         user = generateIdAndName(user);
         validationCheck(user, "PUT");
         if (users.containsKey(user.getId())) {
@@ -38,7 +39,7 @@ public class InMemoryUserStorage implements UserStorage {
             return user;
         } else {
             log.warn("Пользователя не существует");
-            throw new ValidationException("Пользователя не существует");
+            throw new ObjectNotFoundException("Пользователя не существует");
         }
     }
 
@@ -48,7 +49,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public Map<Integer, User> getUsers() {
+    public Map<Long, User> getUsers() {
         return users;
     }
 
@@ -77,7 +78,7 @@ public class InMemoryUserStorage implements UserStorage {
             }
             user.setId(minAvailableId);
         }
-        if (user.getName() == null) {
+        if (user.getName().isEmpty()) {
             user.setName(user.getLogin());
         }
         return user;

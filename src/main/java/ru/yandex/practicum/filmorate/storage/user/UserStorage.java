@@ -11,5 +11,5 @@ public interface UserStorage {
     User createUser(User user) throws ValidationException;
     User updateUser(User user) throws ValidationException;
     List<User> findAllUsers();
-    public Map<Integer, User> getUsers();
+    Map<Long, User> getUsers();
 }

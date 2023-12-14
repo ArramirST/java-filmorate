@@ -13,5 +13,5 @@ public interface FilmStorage {
     Film updateFilm(Film film) throws ValidationException;
 
     List<Film> findAllFilms();
-    public Map<Integer, Film> getFilms();
+    Map<Long, Film> getFilms();
 }

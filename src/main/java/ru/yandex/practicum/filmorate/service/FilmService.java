@@ -2,16 +2,11 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.filmorate.exeptions.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
-import javax.validation.Valid;
 import java.util.*;
 
 @Service
@@ -28,7 +23,7 @@ public class FilmService {
         return filmStorage.createFilm(film);
     }
 
-    public Film updateFilm(Film film) throws ValidationException {
+    public Film updateFilm(Film film) throws ObjectNotFoundException {
         return filmStorage.updateFilm(film);
     }
 
@@ -36,40 +31,55 @@ public class FilmService {
         return filmStorage.findAllFilms();
     }
 
-    public void addLike(long id) throws ObjectNotFoundException {
-        Map<Integer, Film> films = filmStorage.getFilms();
+    public Film addLike(long id, long userId) throws ObjectNotFoundException {
+        Map<Long, Film> films = filmStorage.getFilms();
         if (!films.containsKey(id)) {
             throw new ObjectNotFoundException("Фильм не существует");
+        } else if (userId <= 0) {
+            throw new ObjectNotFoundException("Пользователя не существет");
         }
         Film film = films.get(id);
-        film.addLike(id);
-        filmStorage.updateFilm(film);
+        film.addLike(userId);
+        return filmStorage.updateFilm(film);
     }
 
-    public void removeLike(long id) throws ObjectNotFoundException {
-        Map<Integer, Film> films = filmStorage.getFilms();
+    public Film removeLike(long id, long userId) throws ObjectNotFoundException {
+        Map<Long, Film> films = filmStorage.getFilms();
         if (!films.containsKey(id)) {
             throw new ObjectNotFoundException("Фильм не существует");
+        } else if (userId <= 0) {
+            throw new ObjectNotFoundException("Пользователя не существет");
         }
         Film film = films.get(id);
-        film.removeLike(id);
-        filmStorage.updateFilm(film);
+        film.removeLike(userId);
+        return filmStorage.updateFilm(film);
     }
 
-    public Set<Film> showTop10Films() {
-        Map<Integer, Film> films = filmStorage.getFilms();
-        TreeSet<Film> sortedFilms = new TreeSet<>(new Comparator<Film>() {
-            @Override
-            public int compare(Film o1, Film o2) {
-                return o1.getLikes().size() - o2.getLikes().size();
+    public Set<Film> showTopFilms(int count) {
+        Map<Long, Film> films = filmStorage.getFilms();
+        TreeSet<Film> sortedFilms = new TreeSet<>((o1, o2) -> {
+            if (o2.getLikes().size() == o1.getLikes().size()) {
+                return ((int) o2.getId() - (int) o1.getId());
             }
+            return o2.getLikes().size() - o1.getLikes().size();
         });
         sortedFilms.addAll(films.values());
-        Set<Film> top10Films = new HashSet<>();
-        for (int i = 0; i < 9; i++) {
-            top10Films.add(sortedFilms.first());
+        Set<Film> topFilms = new HashSet<>();
+        if (sortedFilms.size() < count) {
+            count = sortedFilms.size();
+        }
+        for (int i = 0; i <= (count-1); i++) {
+            topFilms.add(sortedFilms.first());
             sortedFilms.remove(sortedFilms.first());
         }
-        return top10Films;
+        return topFilms;
+    }
+
+    public Film getFilm(long id) throws ObjectNotFoundException {
+        Map<Long, Film> films = filmStorage.getFilms();
+        if (!films.containsKey(id)) {
+            throw new ObjectNotFoundException("Фильм не существует");
+        }
+        return films.get(id);
     }
 }
