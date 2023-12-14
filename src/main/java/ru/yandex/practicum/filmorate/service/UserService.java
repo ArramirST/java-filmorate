@@ -23,7 +23,7 @@ public class UserService {
         return userStorage.createUser(user);
     }
 
-    public User updateUser( User user) throws ObjectNotFoundException {
+    public User updateUser(User user) throws ObjectNotFoundException {
         return userStorage.updateUser(user);
     }
 
