@@ -5,7 +5,9 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exeptions.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.*;
 
@@ -13,10 +15,12 @@ import java.util.*;
 public class FilmService {
 
     private FilmStorage filmStorage;
+    private UserStorage userStorage;
 
     @Autowired
-    public FilmService(FilmStorage filmStorage) {
+    public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
         this.filmStorage = filmStorage;
+        this.userStorage = userStorage;
     }
 
     public Film createFilm(Film film) throws ValidationException {
@@ -33,9 +37,10 @@ public class FilmService {
 
     public Film addLike(long id, long userId) throws ObjectNotFoundException {
         Map<Long, Film> films = filmStorage.getFilms();
+        Map<Long, User> users = userStorage.getUsers();
         if (!films.containsKey(id)) {
             throw new ObjectNotFoundException("Фильм не существует");
-        } else if (userId <= 0) {
+        } else if (!users.containsKey(userId)) {
             throw new ObjectNotFoundException("Пользователя не существет");
         }
         Film film = films.get(id);
@@ -45,9 +50,10 @@ public class FilmService {
 
     public Film removeLike(long id, long userId) throws ObjectNotFoundException {
         Map<Long, Film> films = filmStorage.getFilms();
+        Map<Long, User> users = userStorage.getUsers();
         if (!films.containsKey(id)) {
             throw new ObjectNotFoundException("Фильм не существует");
-        } else if (userId <= 0) {
+        } else if (!users.containsKey(userId)) {
             throw new ObjectNotFoundException("Пользователя не существет");
         }
         Film film = films.get(id);
@@ -59,7 +65,7 @@ public class FilmService {
         Map<Long, Film> films = filmStorage.getFilms();
         TreeSet<Film> sortedFilms = new TreeSet<>((o1, o2) -> {
             if (o2.getLikes().size() == o1.getLikes().size()) {
-                return ((int) o2.getId() - (int) o1.getId());
+                return ((int)o2.getId() - (int)o1.getId());
             }
             return o2.getLikes().size() - o1.getLikes().size();
         });
@@ -68,7 +74,7 @@ public class FilmService {
         if (sortedFilms.size() < count) {
             count = sortedFilms.size();
         }
-        for (int i = 0; i <= (count-1); i++) {
+        for (int i = 0; i <= (count - 1); i++) {
             topFilms.add(sortedFilms.first());
             sortedFilms.remove(sortedFilms.first());
         }
