@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.exeptions.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -19,26 +20,28 @@ import java.util.Set;
 @Component
 public class UserController {
 
+    private UserStorage userStorage;
     private UserService userService;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserStorage userStorage, UserService userService) {
+        this.userStorage = userStorage;
         this.userService = userService;
     }
 
     @PostMapping
     public User createUser(@Valid @RequestBody User user) {
-        return userService.createUser(user);
+        return userStorage.createUser(user);
     }
 
     @PutMapping
     public User updateUser(@Valid @RequestBody User user) {
-        return userService.updateUser(user);
+        return userStorage.updateUser(user);
     }
 
     @GetMapping
     public List<User> findAllUsers() {
-        return userService.findAllUsers();
+        return userStorage.findAllUsers();
     }
 
     @GetMapping("/{id}")

@@ -23,18 +23,6 @@ public class FilmService {
         this.userStorage = userStorage;
     }
 
-    public Film createFilm(Film film) throws ValidationException {
-        return filmStorage.createFilm(film);
-    }
-
-    public Film updateFilm(Film film) throws ObjectNotFoundException {
-        return filmStorage.updateFilm(film);
-    }
-
-    public List<Film> findAllFilms() {
-        return filmStorage.findAllFilms();
-    }
-
     public Film addLike(long id, long userId) throws ObjectNotFoundException {
         Map<Long, Film> films = filmStorage.getFilms();
         Map<Long, User> users = userStorage.getUsers();

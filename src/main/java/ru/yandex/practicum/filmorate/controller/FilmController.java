@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.exeptions.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -19,26 +20,28 @@ import java.util.Set;
 @Component
 public class FilmController {
 
+    private FilmStorage filmStorage;
     private FilmService filmService;
 
     @Autowired
-    public FilmController(FilmService filmService) {
+    public FilmController(FilmStorage filmStorage, FilmService filmService) {
+        this.filmStorage = filmStorage;
         this.filmService = filmService;
     }
 
     @PostMapping
     public Film createFilm(@Valid @RequestBody Film film) {
-        return filmService.createFilm(film);
+        return filmStorage.createFilm(film);
     }
 
     @PutMapping
     public Film updateFilm(@Valid @RequestBody Film film) {
-        return filmService.updateFilm(film);
+        return filmStorage.updateFilm(film);
     }
 
     @GetMapping
     public List<Film> findAllFilms() {
-        return filmService.findAllFilms();
+        return filmStorage.findAllFilms();
     }
 
     @GetMapping("/{id}")

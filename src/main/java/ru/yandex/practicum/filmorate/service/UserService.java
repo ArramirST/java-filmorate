@@ -19,18 +19,6 @@ public class UserService {
         this.userStorage = userStorage;
     }
 
-    public User createUser(User user) throws ValidationException {
-        return userStorage.createUser(user);
-    }
-
-    public User updateUser(User user) throws ObjectNotFoundException {
-        return userStorage.updateUser(user);
-    }
-
-    public List<User> findAllUsers() {
-        return userStorage.findAllUsers();
-    }
-
     public User addFriend(long id, long friendId) throws ObjectNotFoundException {
         Map<Long, User> users = userStorage.getUsers();
         if (!users.containsKey(id) || !users.containsKey(friendId)) {
