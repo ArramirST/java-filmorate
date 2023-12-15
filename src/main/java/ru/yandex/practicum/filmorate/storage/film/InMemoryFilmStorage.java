@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exeptions.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.exeptions.ValidationException;
@@ -19,8 +18,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     private static long minAvailableId = 1;
     private FilmValidation filmValidation;
 
-    @Autowired
-    public void setFilmValidation(FilmValidation filmValidation) {
+    public InMemoryFilmStorage(FilmValidation filmValidation) {
         this.filmValidation = filmValidation;
     }
 

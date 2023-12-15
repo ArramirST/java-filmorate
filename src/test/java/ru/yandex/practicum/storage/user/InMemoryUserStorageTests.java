@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.validation.UserValidation;
 
 import java.time.LocalDate;
 
@@ -20,7 +21,7 @@ public class InMemoryUserStorageTests {
     public void beforeEach() {
         user = new User(1, "mail@yandex.ru", "doloreUpdate", "est adipisicing",
                 LocalDate.of(2000, 1, 1));
-        inMemoryUserStorage = new InMemoryUserStorage();
+        inMemoryUserStorage = new InMemoryUserStorage(new UserValidation());
     }
 
     @Test

@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exeptions.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.exeptions.ValidationException;
@@ -21,8 +20,7 @@ public class InMemoryUserStorage implements UserStorage {
     private static long minAvailableId = 1;
     private UserValidation userValidation;
 
-    @Autowired
-    public void setUserValidation(UserValidation userValidation) {
+    public InMemoryUserStorage(UserValidation userValidation) {
         this.userValidation = userValidation;
     }
 

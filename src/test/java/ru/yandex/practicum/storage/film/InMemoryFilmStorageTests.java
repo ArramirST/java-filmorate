@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.validation.FilmValidation;
 
 import java.time.LocalDate;
 
@@ -20,7 +21,7 @@ public class InMemoryFilmStorageTests {
     public void beforeEach() {
         film = new Film(1, "Титаник", "Романтика",
                 LocalDate.of(1998, 2, 20), 2);
-        inMemoryFilmStorage = new InMemoryFilmStorage();
+        inMemoryFilmStorage = new InMemoryFilmStorage(new FilmValidation());
     }
 
     @Test
