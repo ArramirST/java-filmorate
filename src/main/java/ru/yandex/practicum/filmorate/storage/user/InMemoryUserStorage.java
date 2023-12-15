@@ -1,12 +1,13 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exeptions.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.validation.UserValidation;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,11 +19,17 @@ public class InMemoryUserStorage implements UserStorage {
 
     private Map<Long, User> users = new HashMap<>();
     private static long minAvailableId = 1;
+    private UserValidation userValidation;
+
+    @Autowired
+    public void setUserValidation(UserValidation userValidation) {
+        this.userValidation = userValidation;
+    }
 
     @Override
     public User createUser(User user) throws ValidationException {
         user = generateIdAndName(user);
-        validationCheck(user, "POST");
+        userValidation.validationCheck(user, "POST");
         users.put(user.getId(), user);
         log.info("Получен запрос POST к эндпоинту /user, Строка параметров запроса: '{}'", user);
         return user;
@@ -31,7 +38,7 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User updateUser(User user) throws ObjectNotFoundException {
         user = generateIdAndName(user);
-        validationCheck(user, "PUT");
+        userValidation.validationCheck(user, "PUT");
         if (users.containsKey(user.getId())) {
             users.remove(user.getId());
             users.put(user.getId(), user);
@@ -51,24 +58,6 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public Map<Long, User> getUsers() {
         return users;
-    }
-
-    private void validationCheck(User user, String request) throws ValidationException {
-        if (user.getEmail().isEmpty() || !user.getEmail().contains("@")) {
-            log.warn("Получен запрос {} к эндпоинту /user, ошибка: '{}'", request,
-                    "Электронная почта не может быть пустой и должна содержать символ @");
-            throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ @");
-        }
-        if (user.getLogin().isEmpty() || user.getLogin().contains(" ")) {
-            log.warn("Получен запрос {} к эндпоинту /user, ошибка: '{}'", request,
-                    "Логин не может быть пустым и содержать пробелы");
-            throw new ValidationException("Логин не может быть пустым и содержать пробелы");
-        }
-        if (user.getBirthday().isAfter(LocalDate.now())) {
-            log.warn("Получен запрос {} к эндпоинту /user, ошибка: '{}'", request,
-                    "Дата рождения не может быть в будущем");
-            throw new ValidationException("Дата рождения не может быть в будущем");
-        }
     }
 
     private User generateIdAndName(User user) {

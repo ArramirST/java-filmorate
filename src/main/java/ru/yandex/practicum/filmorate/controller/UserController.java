@@ -1,8 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exeptions.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.exeptions.ValidationException;
@@ -17,13 +15,11 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/users")
-@Component
 public class UserController {
 
     private UserStorage userStorage;
     private UserService userService;
 
-    @Autowired
     public UserController(UserStorage userStorage, UserService userService) {
         this.userStorage = userStorage;
         this.userService = userService;

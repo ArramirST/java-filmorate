@@ -1,8 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exeptions.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.exeptions.ValidationException;
@@ -13,17 +11,14 @@ import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/films")
-@Component
 public class FilmController {
 
     private FilmStorage filmStorage;
     private FilmService filmService;
 
-    @Autowired
     public FilmController(FilmStorage filmStorage, FilmService filmService) {
         this.filmStorage = filmStorage;
         this.filmService = filmService;
@@ -60,7 +55,7 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public Set<Film> showTopFilms(@RequestParam(defaultValue = "10") int count) {
+    public List<Film> showTopFilms(@RequestParam(defaultValue = "10") int count) {
         return filmService.showTopFilms(count);
     }
 
