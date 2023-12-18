@@ -1,84 +1,79 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exeptions.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @RestController
-@Slf4j
+@RequestMapping("/films")
 public class FilmController {
 
-    private Map<Integer, Film> films = new HashMap<>();
-    private static int minAvailableId = 1;
+    private FilmStorage filmStorage;
+    private FilmService filmService;
 
-    @PostMapping("/films")
+    public FilmController(FilmStorage filmStorage, FilmService filmService) {
+        this.filmStorage = filmStorage;
+        this.filmService = filmService;
+    }
+
+    @PostMapping
     public Film createFilm(@Valid @RequestBody Film film) {
-        film = generateId(film);
-        validationCheck(film, "POST");
-        films.put(film.getId(), film);
-        log.info("Получен запрос POST к эндпоинту /film, Строка параметров запроса: '{}'", film);
-        return film;
+        return filmStorage.createFilm(film);
     }
 
-    @PutMapping("/films")
+    @PutMapping
     public Film updateFilm(@Valid @RequestBody Film film) {
-        film = generateId(film);
-        validationCheck(film, "PUT");
-        if (films.containsKey(film.getId())) {
-            films.remove(film.getId());
-            films.put(film.getId(), film);
-            log.info("Получен запрос PUT к эндпоинту /film, Строка параметров запроса: '{}'", film);
-            return film;
-        } else {
-            log.warn("Фильма не существует");
-            throw new ValidationException("Фильма не существует");
-        }
+        return filmStorage.updateFilm(film);
     }
 
-    @GetMapping("/films")
+    @GetMapping
     public List<Film> findAllFilms() {
-        return new ArrayList<>(films.values());
+        return filmStorage.findAllFilms();
     }
 
-    private void validationCheck(Film film, String request) throws ValidationException {
-        if (film.getName().isEmpty()) {
-            log.warn("Получен запрос {} к эндпоинту /film, ошибка: '{}'", request,
-                    "Название не может быть пустым");
-            throw new ValidationException("Название не может быть пустым");
-        }
-        if (film.getDescription().length() > 200) {
-            log.warn("Получен запрос {} к эндпоинту /film, ошибка: '{}'", request,
-                    "Максимальная длина описания — 200 символов");
-            throw new ValidationException("Максимальная длина описания — 200 символов");
-        }
-        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-            log.warn("Получен запрос {} к эндпоинту /film, ошибка: '{}'", request,
-                    "Дата релиза — не раньше 28 декабря 1895 года");
-            throw new ValidationException("Дата релиза — не раньше 28 декабря 1895 года");
-        }
-        if (film.getDuration() < 0) {
-            log.warn("Получен запрос {} к эндпоинту /film, ошибка: '{}'", request,
-                    "Продолжительность фильма должна быть положительной");
-            throw new ValidationException("Продолжительность фильма должна быть положительной");
-        }
+    @GetMapping("/{id}")
+    public Film getFilm(@PathVariable long id) {
+        return filmService.getFilm(id);
     }
 
-    private Film generateId(Film film) { /* Оптимизировал генератор. Не совсем понимаю какое свойство
-                                            AtomicInteger может использоваться для улучшения работы */
-        if (film.getId() == 0) {
-            while (films.containsKey(minAvailableId)) {
-                minAvailableId++;
-            }
-            film.setId(minAvailableId);
-        }
-        return film;
+    @PutMapping("/{id}/like/{userId}")
+    public Film addLike(@PathVariable long id, @PathVariable long userId) {
+        return filmService.addLike(id, userId);
+    }
+
+    @DeleteMapping("/{id}/like/{userId}")
+    public Film removeLike(@PathVariable long id, @PathVariable long userId) {
+        return filmService.removeLike(id, userId);
+    }
+
+    @GetMapping("/popular")
+    public List<Film> showTopFilms(@RequestParam(defaultValue = "10") int count) {
+        return filmService.showTopFilms(count);
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<Exception, String> handle(final ValidationException e) {
+        return Map.of(e, e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<Exception, String> handle(final ObjectNotFoundException e) {
+        return Map.of(e, e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public Map<Exception, String> handle(final Exception e) {
+        return Map.of(e, e.getMessage());
     }
 }
