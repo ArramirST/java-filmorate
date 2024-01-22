@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.Data;
+import ru.yandex.practicum.filmorate.constants.Genre;
+import ru.yandex.practicum.filmorate.constants.MPA;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -20,6 +22,8 @@ public class Film {
     private LocalDate releaseDate;
     private int duration;
     private Set<Long> likes = new HashSet<>();
+    private Genre genre;
+    private MPA mpa;
 
     public Film(long id, String name, String description, LocalDate releaseDate, int duration) {
         this.id = id;

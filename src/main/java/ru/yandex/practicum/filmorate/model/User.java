@@ -18,7 +18,7 @@ public class User {
     private String login;
     private String name;
     private LocalDate birthday;
-    private Set<Long> friends = new HashSet<>();
+    private Set<Long> friends = new HashSet<>(); //todo
 
     public User(long id, String email, String login, String name, LocalDate birthday) {
         this.id = id;
